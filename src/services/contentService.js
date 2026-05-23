@@ -17,6 +17,20 @@ async function create(contentData) {
 }
 
 /**
+ * Finds all AR content documents (excludes soft-deleted).
+ * @returns {Promise<object[]>} Array of all AR content documents
+ */
+async function findAll() {
+  try {
+    return await ArContent.find({ isDeleted: false }).sort({ createdAt: -1 });
+  } catch (err) {
+    const error = new Error(`Failed to fetch AR content: ${err.message}`);
+    error.code = 'DATABASE_ERROR';
+    throw error;
+  }
+}
+
+/**
  * Finds AR content documents near a geographic point.
  * @param {number} lat - Latitude of the center point
  * @param {number} lon - Longitude of the center point
@@ -95,6 +109,7 @@ async function softDelete(id) {
 
 module.exports = {
   create,
+  findAll,
   findNearby,
   findById,
   softDelete

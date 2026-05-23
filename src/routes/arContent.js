@@ -5,6 +5,7 @@ const { validateArContent, validateNearbyQuery, validateObjectId } = require('..
 const arContentController = require('../controllers/arContentController');
 
 router.post('/', upload, validateArContent, arContentController.create);
+router.get('/', arContentController.getAll);
 router.get('/nearby', validateNearbyQuery, arContentController.getNearby);
 router.get('/:id', validateObjectId, arContentController.getById);
 router.delete('/:id', validateObjectId, arContentController.softDelete);

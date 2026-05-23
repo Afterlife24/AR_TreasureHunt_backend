@@ -46,6 +46,18 @@ async function create(req, res, next) {
 }
 
 /**
+ * Gets all AR content documents (not deleted).
+ */
+async function getAll(req, res, next) {
+  try {
+    const results = await contentService.findAll();
+    res.status(200).json({ success: true, items: results });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * Finds AR content near a geographic point.
  */
 async function getNearby(req, res, next) {
@@ -90,6 +102,7 @@ async function softDelete(req, res, next) {
 
 module.exports = {
   create,
+  getAll,
   getNearby,
   getById,
   softDelete
