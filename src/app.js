@@ -10,9 +10,14 @@ app.use(express.json());
 
 // Request logging middleware
 app.use((req, res, next) => {
-    const timestamp = new Date().toLocaleTimeString();
-    console.log(`[${timestamp}] ${req.method} ${req.path}`);
-    next();
+  const timestamp = new Date().toLocaleTimeString();
+  console.log(`[${timestamp}] ${req.method} ${req.path}`);
+  next();
+});
+
+// Health check
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', service: 'ar-treasure-hunt-api' });
 });
 
 // Route mounting

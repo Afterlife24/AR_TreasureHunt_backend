@@ -1,0 +1,32 @@
+service: ar-treasure-hunt-api
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-3
+  memorySize: 256
+  timeout: 30
+  environment:
+    MONGODB_URI: ${env:MONGODB_URI}
+    AWS_S3_BUCKET: ${env:AWS_S3_BUCKET}
+    CLOUDFRONT_DOMAIN: ${env:CLOUDFRONT_DOMAIN}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+            - s3:ListBucket
+          Resource:
+            - arn:aws:s3:::ar-treasure-hunt-assets
+            - arn:aws:s3:::ar-treasure-hunt-assets/*
+
+functions:
+  api:
+    handler: lambda.handler
+    events:
+      - httpApi: '*'
