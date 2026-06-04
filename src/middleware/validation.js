@@ -55,21 +55,25 @@ function validateArContent(req, res, next) {
     return next(error);
   }
 
-  // Validate WebP signature for clueRenderImage
-  // Bytes 0-3: RIFF, Bytes 8-11: WEBP
+  // Validate clueRenderImage: accept WebP OR JPEG
   const clueBuffer = req.files.clueRenderImage[0].buffer;
-  if (
-    clueBuffer.length < 12 ||
-    clueBuffer[0] !== 0x52 || // R
-    clueBuffer[1] !== 0x49 || // I
-    clueBuffer[2] !== 0x46 || // F
-    clueBuffer[3] !== 0x46 || // F
-    clueBuffer[8] !== 0x57 || // W
-    clueBuffer[9] !== 0x45 || // E
-    clueBuffer[10] !== 0x42 || // B
-    clueBuffer[11] !== 0x50    // P
-  ) {
-    const error = new Error('clueRenderImage must be a valid WebP file');
+  const isWebP = clueBuffer.length >= 12 &&
+    clueBuffer[0] === 0x52 && // R
+    clueBuffer[1] === 0x49 && // I
+    clueBuffer[2] === 0x46 && // F
+    clueBuffer[3] === 0x46 && // F
+    clueBuffer[8] === 0x57 && // W
+    clueBuffer[9] === 0x45 && // E
+    clueBuffer[10] === 0x42 && // B
+    clueBuffer[11] === 0x50;   // P
+
+  const isJPEG = clueBuffer.length >= 3 &&
+    clueBuffer[0] === 0xFF &&
+    clueBuffer[1] === 0xD8 &&
+    clueBuffer[2] === 0xFF;
+
+  if (!isWebP && !isJPEG) {
+    const error = new Error('clueRenderImage must be a valid WebP or JPEG file');
     error.code = 'VALIDATION_ERROR';
     return next(error);
   }
