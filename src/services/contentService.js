@@ -1,4 +1,5 @@
 const ArContent = require('../models/ArContent');
+const roomService = require('./roomService');
 
 /**
  * Creates a new AR content document.
@@ -32,14 +33,16 @@ async function findAll() {
 
 /**
  * Finds AR content documents near a geographic point.
+ * Filters private clues based on room membership when playerId is provided.
  * @param {number} lat - Latitude of the center point
  * @param {number} lon - Longitude of the center point
  * @param {number} radiusMeters - Search radius in meters
+ * @param {string|null} playerId - Optional player ID for room-based filtering
  * @returns {Promise<object[]>} Array of nearby AR content documents
  */
-async function findNearby(lat, lon, radiusMeters) {
+async function findNearby(lat, lon, radiusMeters, playerId = null) {
   try {
-    return await ArContent.find({
+    const allNearby = await ArContent.find({
       isDeleted: false,
       location: {
         $nearSphere: {
@@ -50,6 +53,23 @@ async function findNearby(lat, lon, radiusMeters) {
           $maxDistance: radiusMeters
         }
       }
+    });
+
+    // If no playerId provided, exclude private clues that have a roomId
+    if (!playerId) {
+      return allNearby.filter(item => item.visibility !== 'private' || !item.roomId);
+    }
+
+    // Get all room IDs the player belongs to
+    const playerRoomIds = await roomService.getPlayerRoomIds(playerId);
+    const roomIdSet = new Set(playerRoomIds.map(id => id.toString()));
+
+    // Filter: include public clues + private clues from player's rooms
+    return allNearby.filter(item => {
+      if (item.visibility !== 'private' || !item.roomId) {
+        return true;
+      }
+      return roomIdSet.has(item.roomId.toString());
     });
   } catch (err) {
     const error = new Error(`Failed to query nearby content: ${err.message}`);

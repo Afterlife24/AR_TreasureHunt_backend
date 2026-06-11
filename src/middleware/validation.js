@@ -189,10 +189,90 @@ function validateProgressBody(req, res, next) {
   next();
 }
 
+/**
+ * Validates room creation body (playerId, playerName).
+ */
+function validateCreateRoom(req, res, next) {
+  const { playerId, playerName } = req.body;
+
+  if (!playerId || typeof playerId !== 'string' || playerId.trim() === '') {
+    const error = new Error('playerId must be a non-empty string');
+    error.code = 'VALIDATION_ERROR';
+    return next(error);
+  }
+
+  if (!playerName || typeof playerName !== 'string' || playerName.trim() === '') {
+    const error = new Error('playerName must be a non-empty string');
+    error.code = 'VALIDATION_ERROR';
+    return next(error);
+  }
+
+  next();
+}
+
+/**
+ * Validates room join body (roomCode, playerId, playerName).
+ */
+function validateJoinRoom(req, res, next) {
+  const { roomCode, playerId, playerName } = req.body;
+
+  if (!roomCode || typeof roomCode !== 'string' || roomCode.trim() === '') {
+    const error = new Error('roomCode must be a non-empty string');
+    error.code = 'VALIDATION_ERROR';
+    return next(error);
+  }
+
+  if (!playerId || typeof playerId !== 'string' || playerId.trim() === '') {
+    const error = new Error('playerId must be a non-empty string');
+    error.code = 'VALIDATION_ERROR';
+    return next(error);
+  }
+
+  if (!playerName || typeof playerName !== 'string' || playerName.trim() === '') {
+    const error = new Error('playerName must be a non-empty string');
+    error.code = 'VALIDATION_ERROR';
+    return next(error);
+  }
+
+  next();
+}
+
+/**
+ * Validates link clues body (playerId, clueIds).
+ */
+function validateLinkClues(req, res, next) {
+  const { playerId, clueIds } = req.body;
+
+  if (!playerId || typeof playerId !== 'string' || playerId.trim() === '') {
+    const error = new Error('playerId must be a non-empty string');
+    error.code = 'VALIDATION_ERROR';
+    return next(error);
+  }
+
+  if (!Array.isArray(clueIds) || clueIds.length === 0) {
+    const error = new Error('clueIds must be a non-empty array');
+    error.code = 'VALIDATION_ERROR';
+    return next(error);
+  }
+
+  for (const id of clueIds) {
+    if (!id || typeof id !== 'string' || !OBJECT_ID_REGEX.test(id)) {
+      const error = new Error('Each clueId must be a valid 24-character hex ObjectId');
+      error.code = 'VALIDATION_ERROR';
+      return next(error);
+    }
+  }
+
+  next();
+}
+
 module.exports = {
   validateArContent,
   validateNearbyQuery,
   validateObjectId,
   validateSessionBody,
-  validateProgressBody
+  validateProgressBody,
+  validateCreateRoom,
+  validateJoinRoom,
+  validateLinkClues
 };

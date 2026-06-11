@@ -5,9 +5,12 @@
 function errorHandler(err, req, res, next) {
   const statusMap = {
     VALIDATION_ERROR: 400,
+    FORBIDDEN: 403,
     NOT_FOUND: 404,
+    ALREADY_MEMBER: 409,
     UPLOAD_ERROR: 500,
-    DATABASE_ERROR: 500
+    DATABASE_ERROR: 500,
+    GENERATION_ERROR: 500
   };
 
   const code = err.code || 'INTERNAL_ERROR';

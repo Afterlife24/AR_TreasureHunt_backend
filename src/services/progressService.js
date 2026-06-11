@@ -1,10 +1,12 @@
 const ClueProgress = require('../models/ClueProgress');
 const GameSession = require('../models/GameSession');
 const ArContent = require('../models/ArContent');
+const roomService = require('./roomService');
 
 /**
  * Records clue progress for a player in a game session.
  * Validates that the sessionId and clueId reference existing documents.
+ * For private clues with a roomId, validates room membership.
  * @param {string} sessionId - MongoDB ObjectId of the game session
  * @param {string} playerId - Player identifier
  * @param {string} clueId - MongoDB ObjectId of the AR content clue
@@ -25,6 +27,16 @@ async function recordProgress(sessionId, playerId, clueId) {
     const error = new Error('AR content clue not found');
     error.code = 'NOT_FOUND';
     throw error;
+  }
+
+  // Room membership gate for private clues with a roomId
+  if (content.visibility === 'private' && content.roomId) {
+    const isMember = await roomService.validateMembership(content.roomId, playerId);
+    if (!isMember) {
+      const error = new Error('Player is not a member of the room linked to this clue');
+      error.code = 'FORBIDDEN';
+      throw error;
+    }
   }
 
   try {

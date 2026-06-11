@@ -24,6 +24,7 @@ app.get('/', (req, res) => {
 app.use('/api/ar-content', require('./routes/arContent'));
 app.use('/api/game-sessions', require('./routes/gameSession'));
 app.use('/api/clue-progress', require('./routes/clueProgress'));
+app.use('/api/rooms', require('./routes/room'));
 
 // Global error handler (must be after routes)
 app.use(errorHandler);

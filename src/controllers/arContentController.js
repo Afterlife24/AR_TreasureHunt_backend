@@ -65,8 +65,9 @@ async function getNearby(req, res, next) {
     const lat = parseFloat(req.query.lat);
     const lon = parseFloat(req.query.lon);
     const radius = parseFloat(req.query.radius);
+    const playerId = req.query.playerId || null;
 
-    const results = await contentService.findNearby(lat, lon, radius);
+    const results = await contentService.findNearby(lat, lon, radius, playerId);
 
     res.status(200).json({ items: results });
   } catch (error) {

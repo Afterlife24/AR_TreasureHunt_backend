@@ -67,6 +67,9 @@ const arContentSchema = new Schema({
   // Soft delete flag
   isDeleted: { type: Boolean, default: false },
 
+  // Room linkage (null = public clue, set = private room clue)
+  roomId: { type: Schema.Types.ObjectId, ref: 'Room', default: null },
+
   // Additional metadata from contentJson (flexible)
   metadata: { type: Schema.Types.Mixed }
 }, {
@@ -78,5 +81,8 @@ arContentSchema.index({ location: '2dsphere' });
 
 // Compound index for efficient filtered queries
 arContentSchema.index({ isDeleted: 1, location: '2dsphere' });
+
+// Compound index for room-based queries
+arContentSchema.index({ roomId: 1, isDeleted: 1 });
 
 module.exports = mongoose.model('ArContent', arContentSchema);
